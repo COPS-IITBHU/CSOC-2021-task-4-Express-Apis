@@ -3,6 +3,8 @@ const { json, urlencoded } = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 
+const { ToDoRoutes, UserRoutes } = require("./routes");
+
 const app = express();
 
 app.use(json());
@@ -11,6 +13,9 @@ app.use(cors());
 
 // disable powered by cookies
 app.disable("x-powered-by");
+
+app.use("/api/auth", UserRoutes);
+app.use("/api/todo", ToDoRoutes);
 
 const PORT = process.env.PORT || 8000;
 const mongoDB = "mongodb://127.0.0.1/my_database";

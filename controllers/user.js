@@ -8,7 +8,7 @@ const createToken = (user) => {
   });
 };
 
-const signin = async (req, res) => {
+const login = async (req, res) => {
   // TODO: Read username, pwd from the req object
   // Check if data is valid
   // Return correct status codes: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
@@ -29,4 +29,4 @@ const profile = async (req, res) => {
   // Check for the token and then use it to get user details
 };
 
-module.exports = { signin, signup, profile };
+module.exports = { login, signup, profile };
