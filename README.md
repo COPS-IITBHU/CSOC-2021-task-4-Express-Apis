@@ -8,9 +8,11 @@ Welcome to the Week 5 of CSOC Dev. In this assignment, you will be working on th
 ### Setting up the project
 
 - Fork and clone this repo.
-- Go to project folder in terminal and run `npm install`, to install all dependencies.
-- Start the development server using `npm run dev`.
+- Go the project folder in terminal and run `yarn` to install all dependencies.
+- Run `yarn connectDB`to connect to the DB.
+- Start the development server using `yarn dev`.
 - Server should automatically reload and reflect your changes upon saving, if that doesn't happen quit the server using `ctrl+c` and restart development server.
+- Install postman/insomnia for processing the requests.
 
 ### Working
 The API which we had created for Task 1 is deployed at https://todo-app-csoc.herokuapp.com/.
@@ -19,7 +21,7 @@ You'll have to complete two subtasks:
 
 - **Complete all the basic endpoints (API Description is included below)**:
 
-  Auth - Login, Register, Get Profile and Todo - Get Detail, Get List, Create, Edit and Delete.You will also have to add the middleware function for authorization. In this subtask, only the creator of the Todo will have the access to View, Edit or Delete the Todo. As an example, we have created the endpoint `/todo/create/` for you. However, it just returns an empty `200 RESPONSE` on success. You will have to modify the endpoint to return the created Todo details too in the response body, along with a `200 RESPONSE`. The necessary details for this subtask are mentioned in the comments too.
+  Auth - Login, Register, Get Profile and Todo - Get Detail, Get List, Create, Edit and Delete.You will also have to add the middleware function for authorization. In this subtask, only the creator of the Todo will have the access to View, Edit or Delete the Todo. 
 
 - **Implement collaborator feature**:
 
