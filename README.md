@@ -19,13 +19,13 @@ You'll have to complete two subtasks:
 
 - **Complete all the basic endpoints (API Description is included below)**:
 
-  Auth - Login, Register, Get Profile and Todo - Get Detail, Get List, Create, Edit and Delete. In this subtask, only the creator of the Todo will have the access to View, Edit or Delete the Todo. As an example, we have created the endpoint `/todo/create/` for you. However, it just returns an empty `200 RESPONSE` on success. You will have to modify the endpoint to return the created Todo details too in the response body, along with a `200 RESPONSE`. The necessary details for this subtask are mentioned in the comments too.
+  Auth - Login, Register, Get Profile and Todo - Get Detail, Get List, Create, Edit and Delete.You will also have to add the middleware function for authorization. In this subtask, only the creator of the Todo will have the access to View, Edit or Delete the Todo. As an example, we have created the endpoint `/todo/create/` for you. However, it just returns an empty `200 RESPONSE` on success. You will have to modify the endpoint to return the created Todo details too in the response body, along with a `200 RESPONSE`. The necessary details for this subtask are mentioned in the comments too.
 
 - **Implement collaborator feature**:
 
   In this subtask, you will have to implement a feature where the creator of a todo can add or remove the collaborators to a todo. Specifically, for every todo, the owner can add one or more collaborator to a todo and can remove one or more collaborators from a todo. So, every todo will have a set of collaborators (may be empty too). The collaborator of a todo will have the access to Edit or Delete the todo, but he won't be able to add or delete the collaborators to the todo. Only the creator of the todo will have the permission to add or remove collaborators.
   
-  For this subtask, you may need to fiddle around with the models, create some views and serializers and make the necessary endpoints. We suggest you to create the two endpoints `/todo/{id}/add-collaborators/` and `/todo/{id}/remove-collaborators/` for adding and removing collaborators, respectively. Also, you will need to modify the GET Todo endpoint to display all the Todo - the one which the user has created, and the one for which the user is collaborating. Make sure to distinguish between the two of them, and we leave your imagination on how to do this.
+  For this subtask, you may need to fiddle around with the models, create some views and serializers and make the necessary endpoints. We suggest you to create the two endpoints `/todo/:id/add-collaborators/` and `/todo/:id/remove-collaborators/` for adding and removing collaborators, respectively. Also, you will need to modify the GET Todo endpoint to display all the Todo - the one which the user has created, and the one for which the user is collaborating. Make sure to distinguish between the two of them, and we leave your imagination on how to do this.
   
 Make sure to do proper validation of the requests, and grant proper permissions to a user.
 
@@ -46,10 +46,9 @@ You'll have a week to complete this task. Hence, the deadline of this task is 15
 ## API Description (Only for Subtask 1)
 
 ### Auth System
-For this API, you will have to use Token-based Authorization. We have already created the serializer and the functions required to create token for a user, for your reference. All the requests made to the API (except the Login and Register endpoints) shall need an  **Authorization header**  with a valid token and the prefix  **Token**. Make sure to add proper permissions in the views to implement this.
+For this API, you will have to use Token-based Authorization. We have already created a model named **Token**  required to create token for a user, for your reference. All the requests made to the API (except the Login and Register endpoints) shall need an  *Authorization header*  with a valid token and the prefix  *Token*. Make sure to add proper permissions in the views to implement this.
 
-The authorization header shall have the following format:
-`Authorization: Token <token>`
+For authorization, a `createToken()` has been created in the `controllers/user.js`. Generally we use jwt for authentication but here we have created a model for the same.
 
 In order to obtain a valid token it's necessary to send a request  `POST /auth/login/`  with  **username**  and  **password**. To register a new user it's necessary to make a request  `POST /auth/register/`  with name, email, username and password.
 
@@ -153,7 +152,7 @@ In order to obtain a valid token it's necessary to send a request  `POST /auth/l
 	```
 	Response Code: `200`
 
--   `GET /todo/{id}/`
+-   `GET /todo/:id/`
 
 	Get the Todo of the logged in user with given id. Requires token in the Authorization header.
   
@@ -166,7 +165,7 @@ In order to obtain a valid token it's necessary to send a request  `POST /auth/l
 	```
 	Response Code: `200`
 
--   `PUT /todo/{id}/`
+-   `PUT /todo/:id/`
 
 	Change the title of the Todo with given id, and get the new title as response. Requires token in the Authorization header.
   
@@ -184,7 +183,7 @@ In order to obtain a valid token it's necessary to send a request  `POST /auth/l
 	}
 	```
 
--   `PATCH /todo/{id}/`
+-   `PATCH /todo/:id/`
 
 	Change the title of the Todo with given id, and get the new title as response. Requires token in the Authorization header.
   
@@ -202,7 +201,7 @@ In order to obtain a valid token it's necessary to send a request  `POST /auth/l
 	}
 	```
 
--   `DELETE /todo/{id}/`
+-   `DELETE /todo/:id/`
 
 	Delete the Todo with given id. Requires token in the Authorization header.
   
@@ -210,6 +209,6 @@ In order to obtain a valid token it's necessary to send a request  `POST /auth/l
 
 ### Testing the API
 
-The API can be tested by running the Django server locally, going to the following url: [http://127.0.0.1:8000/](http://127.0.0.1:8000/), clicking the "Try it out" button after selecting the endpoint and finally executing it along with the Response Body (if required).
+The API can be tested by running the NodeJS server locally, going to the following url: [http://127.0.0.1:8000/](http://127.0.0.1:8000/), clicking the "Try it out" button after selecting the endpoint and finally executing it along with the Response Body (if required).
 
 For testing the endpoints which require **Token** in the Authorization header, you can click on the "Authorize" button, write the Authorization token as  `Token <token>` (which you have obtained from the `auth/login/` endpoint) and finally click on "Authorize". Thereafter, all the requests made to any endpoint will have the Token in the Authorization Header.
