@@ -7,11 +7,10 @@ Welcome to the Week 5 of CSOC Dev. In this assignment, you will be working on th
 
 ### Setting up the project
 
-- Make sure `python3.7` and `pip` are installed. Install `pipenv` by running `pip install pipenv`.
-- Install python dependencies using the command `pipenv install` Please use only pipenv for managing dependencies (Follow this [link](https://realpython.com/pipenv-guide/) if you are new to pipenv).
-- To activate this project's virtualenv, run `pipenv shell`.
-- Run `python manage.py migrate` to apply migrations.
-- Start the development server using `python manage.py runserver`
+- Fork and clone this repo.
+- Go to project folder in terminal and run `npm install`, to install all dependencies.
+- Start the development server using `npm run dev`.
+- Server should automatically reload and reflect your changes upon saving, if that doesn't happen quit the server using `ctrl+c` and restart development server.
 
 ### Working
 The working of the API server was explained in the Task 1 itself. However, we are including the description of the API at the end of this readme for your reference. The API which we had created for Task 1 is deployed at https://todo-app-csoc.herokuapp.com/.
