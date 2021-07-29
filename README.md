@@ -13,7 +13,7 @@ Welcome to the Week 5 of CSOC Dev. In this assignment, you will be working on th
 - Server should automatically reload and reflect your changes upon saving, if that doesn't happen quit the server using `ctrl+c` and restart development server.
 
 ### Working
-The working of the API server was explained in the Task 1 itself. However, we are including the description of the API at the end of this readme for your reference. The API which we had created for Task 1 is deployed at https://todo-app-csoc.herokuapp.com/.
+The API which we had created for Task 1 is deployed at https://todo-app-csoc.herokuapp.com/.
 
 You'll have to complete two subtasks:
 
