@@ -12,4 +12,7 @@ router.put("/:id/", ToDoController.editToDo);
 router.patch("/:id/", ToDoController.editToDoPatch);
 router.delete("/:id/", ToDoController.deleteToDo);
 
+router.post("/:id/add-collaborators/", ToDoController.addCollaborators);
+router.delete("/:id/remove-collaborators/:username", ToDoController.removeCollaborators);
+
 module.exports = router;

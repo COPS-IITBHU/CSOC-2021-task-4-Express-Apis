@@ -20,7 +20,7 @@ const login = async (req, res) => {
 
   User.findOne({username:username}, function(err, foundUser){
     if(err){
-      console.log(err)
+      res.send(err)
     }else{
       if(foundUser.password == password){
         Token.findOne({user: foundUser}, function(error, foundToken){
@@ -31,7 +31,7 @@ const login = async (req, res) => {
           }
         })
       }else{
-        res.send("User Not Found")
+        res.status(404).send("User Not Found");
       }
     }
   })
@@ -57,7 +57,7 @@ const signup = async (req, res) => {
 
   newUser.save(function(err){
     if(err){
-      console.log(err)
+      res.send(err)
     }else{
       const token = createToken(newUser)
       token.save()
@@ -72,30 +72,44 @@ const profile = async (req, res) => {
   // Implement the functionality to retrieve the details
   // of the logged in user.
   // Check for the token and then use it to get user details
-  // User.findOne({username:req.body.username, password: req.body.username})
 
-  console.log(req.headers.authorization.split(' ')[1])
-
-  const token =
+  try{
+    const token =
     req.body.token || req.query.token || req.headers["x-access-token"] || req.headers.token || req.headers.authorization.split(' ')[1];
 
-    Token.findOne({token: token}, function(err, foundToken){
-      if(err){
-        console.log(err)
-      }
-      else{
-        if(foundToken){
-          User.findById(foundToken.user, function(err, foundUser){
-            if(foundUser){
-              res.status(200).json({id: foundUser._id, name: foundUser.name, email: foundUser.email, username: foundUser.email})
-            }
-          })
+
+    if(token != null)
+    {
+      Token.findOne({token: token}, function(err, foundToken){
+        if(err){
+          res.send(err)
         }
         else{
-          res.send("Token not found")
+          if(foundToken){
+            User.findById(foundToken.user, function(err, foundUser){
+              if(foundUser){
+                res.status(200).json({id: foundUser._id, name: foundUser.name, email: foundUser.email, username: foundUser.email})
+              }
+            })
+          }
+          else{
+            res.status(401).json({
+              detail: "Authentication credentials were not provided."
+            })
+          }
         }
-      }
+      })
+    }else{
+      res.status(401).json({
+        detail: "Authentication credentials were not provided."
+      })
+    }
+
+  }catch{
+    res.status(401).json({
+      detail: "Authentication credentials were not provided."
     })
+  }
 };
 
 module.exports = { login, signup, profile };

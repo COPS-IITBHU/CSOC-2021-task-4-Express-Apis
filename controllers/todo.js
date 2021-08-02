@@ -32,11 +32,11 @@ const getAllToDo = async (req, res) => {
   if(token != null){
     Token.findOne({token: token}, function(err, foundToken){
       if(err){
-        console.log(err)
+        res.send(err)
       }
       else{
         if(foundToken){
-              ToDo.find({createdBy : foundToken.user}, function(err, foundUsers){
+              ToDo.find({ $or: [{createdBy : foundToken.user}, {collaborators: {"$in" : [foundToken.user.username]}}]}, function(err, foundUsers){
                 if(foundUsers){
                   users = []
                   foundUsers.forEach(function(user){
@@ -50,13 +50,17 @@ const getAllToDo = async (req, res) => {
               })
         }
         else{
-          res.send("Token not found")
+          res.status(401).json({
+            detail: "Authentication credentials were not provided."
+          })
         }
       }
     })
   }
   else{
-    return res.status(403).send("A token is required for authentication");
+    res.status(401).json({
+      detail: "Authentication credentials were not provided."
+    })
   }
 };
 
@@ -67,7 +71,7 @@ const createToDo = async (req, res) => {
   if(token != null){
     Token.findOne({token: token}, function(err, foundToken){
       if(err){
-        console.log(err)
+        res.send(err)
       }
       else{
         if(foundToken){
@@ -85,13 +89,17 @@ const createToDo = async (req, res) => {
               })
         }
         else{
-          res.send("Token not found")
+          res.status(401).json({
+            detail: "Authentication credentials were not provided."
+          })
         }
       }
     })
   }
   else{
-    return res.status(403).send("A token is required for authentication");
+    res.status(401).json({
+      detail: "Authentication credentials were not provided."
+    })
   }
 };
 
@@ -105,7 +113,9 @@ const getParticularToDo = async (req, res) => {
       }
     })
   }else{
-    return res.status(403).send("A token is required for authentication");
+    res.status(401).json({
+      detail: "Authentication credentials were not provided."
+    })
   }
 };
 
@@ -138,7 +148,9 @@ const editToDo = async (req, res) => {
       }
     })
   }else{
-    return res.status(403).send("A token is required for authentication");
+    res.status(401).json({
+      detail: "Authentication credentials were not provided."
+    })
   }
 };
 
@@ -154,10 +166,6 @@ const editToDoPatch = async (req, res) => {
             $set: {title: req.body.title}
           }, 
           function(err, result){
-            if(!err){
-              if(result){
-              }
-            }
         })
         ToDo.findOne({_id:req.params.id}, function(err, result){
           if(!err){
@@ -169,7 +177,9 @@ const editToDoPatch = async (req, res) => {
       }
     })
   }else{
-    return res.status(403).send("A token is required for authentication");
+    res.status(401).json({
+      detail: "Authentication credentials were not provided."
+    })
   }
 };
 
@@ -183,7 +193,91 @@ const deleteToDo = async (req, res) => {
       }
     })
   }else{
-    return res.status(403).send("A token is required for authentication");
+    res.status(401).json({
+      detail: "Authentication credentials were not provided."
+    })
+  }
+};
+
+const addCollaborators = async (req, res) => {
+  //  Delete the todo with given id
+  const token = verifyToken(req,res);
+  if(token != null){
+    Token.findOne({token: token}, function(err, foundToken){
+      if(err){
+        res.send(err)
+      }
+      else{
+        if(foundToken){
+          ToDo.updateMany({ $and: [{_id:req.params.id}, {collaborators: {"$nin" : [foundToken.user.username]}} ] }, 
+            {
+              $push: {collaborators: {username: req.body.username}}
+            }, 
+            function(err, result){
+              if(err){
+                res.send(err)
+              }
+              else if(result.nModified == 0)
+              {
+                res.status(401).send("Collaborators of a task can't add collaborators")
+              }
+              else{
+                res.status(200).send("Collaborators added")
+              }
+          })
+        }
+        else{
+          res.status(401).json({
+            detail: "Authentication credentials were not provided."
+          })
+        }
+      }
+    })
+  }
+  else{
+    res.status(401).json({
+      detail: "Authentication credentials were not provided."
+    })
+  }
+};
+
+const removeCollaborators = async (req, res) => {
+  //  Delete the todo with given id
+  const token = verifyToken(req,res);
+  if(token != null){
+    Token.findOne({token: token}, function(err, foundToken){
+      if(err){
+        res.send(err)
+      }
+      else{
+        if(foundToken){
+          ToDo.updateMany({ $and: [{_id:req.params.id}, {collaborators: {"$nin" : [foundToken.user.username]}} ] }, 
+            {
+              $pull: {collaborators: {username: req.body.username}}
+            }, 
+            function(err, result){
+              if(result.nModified == 0)
+              {
+                res.status(401).send("Collaborators of a task can't add collaborators")
+              }
+              else if(!err){
+                res.status(204).send("Succesfully Deleted")
+              }
+
+          })
+        }
+        else{
+          res.status(401).json({
+            detail: "Authentication credentials were not provided."
+          })
+        }
+      }
+    })
+  }
+  else{
+    res.status(401).json({
+      detail: "Authentication credentials were not provided."
+    })
   }
 };
 
@@ -194,4 +288,6 @@ module.exports = {
   editToDoPatch,
   getAllToDo,
   getParticularToDo,
+  addCollaborators,
+  removeCollaborators
 };
