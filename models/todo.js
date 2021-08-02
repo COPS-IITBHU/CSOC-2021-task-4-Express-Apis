@@ -3,6 +3,7 @@ const { Schema, model } = require("mongoose");
 const todoSchema = new Schema(
   {
     title: { type: String, required: true },
+    collaborators: [],
     createdBy: { type: Schema.Types.ObjectId, ref: "User" },
   },
   { timestamps: true }

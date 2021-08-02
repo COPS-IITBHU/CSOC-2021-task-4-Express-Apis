@@ -7,6 +7,14 @@ const { ToDoRoutes, UserRoutes } = require("./routes");
 
 const app = express();
 
+var requestTime = function (req, res, next) {
+
+  req.requestTime = Date.now()
+  next()
+  }
+
+app.use(requestTime)
+
 app.use(json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
