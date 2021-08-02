@@ -12,7 +12,19 @@ router.put("/:id/", ToDoController.editToDo);
 router.patch("/:id/", ToDoController.editToDoPatch);
 router.delete("/:id/", ToDoController.deleteToDo);
 
+// Endpoints for collaborators
+
+// Request Body Sample 
+// {
+//     id: "UserId"
+// }
 router.post("/:id/add-collaborators/", ToDoController.addCollaborators);
-router.delete("/:id/remove-collaborators/:username", ToDoController.removeCollaborators);
+
+
+// Request Body Sample 
+// {
+//     id: "UserId"
+// }
+router.delete("/:id/remove-collaborators/", ToDoController.removeCollaborators);
 
 module.exports = router;

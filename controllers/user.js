@@ -88,7 +88,7 @@ const profile = async (req, res) => {
           if(foundToken){
             User.findById(foundToken.user, function(err, foundUser){
               if(foundUser){
-                res.status(200).json({id: foundUser._id, name: foundUser.name, email: foundUser.email, username: foundUser.email})
+                res.status(200).json({id: foundUser._id, name: foundUser.name, email: foundUser.email, username: foundUser.username})
               }
             })
           }

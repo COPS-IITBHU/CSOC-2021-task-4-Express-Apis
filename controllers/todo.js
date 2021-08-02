@@ -36,7 +36,7 @@ const getAllToDo = async (req, res) => {
       }
       else{
         if(foundToken){
-              ToDo.find({ $or: [{createdBy : foundToken.user}, {collaborators: {"$in" : [foundToken.user.username]}}]}, function(err, foundUsers){
+              ToDo.find({ $or: [{createdBy : foundToken.user}, {collaborators: {"$in" : foundToken.user._id.toString()}}]}, function(err, foundUsers){
                 if(foundUsers){
                   users = []
                   foundUsers.forEach(function(user){
@@ -209,13 +209,13 @@ const addCollaborators = async (req, res) => {
       }
       else{
         if(foundToken){
-          ToDo.updateMany({ $and: [{_id:req.params.id}, {collaborators: {"$nin" : [foundToken.user.username]}} ] }, 
+          ToDo.updateMany({ $and: [{_id:req.params.id}, {collaborators: {"$nin" : foundToken.user._id.toString()}} ] }, 
             {
-              $push: {collaborators: {username: req.body.username}}
+              $push: {collaborators: req.body.id}
             }, 
             function(err, result){
               if(err){
-                res.send(err)
+                res.status(401).send("Collaborators of a task can't add collaborators")
               }
               else if(result.nModified == 0)
               {
@@ -251,12 +251,15 @@ const removeCollaborators = async (req, res) => {
       }
       else{
         if(foundToken){
-          ToDo.updateMany({ $and: [{_id:req.params.id}, {collaborators: {"$nin" : [foundToken.user.username]}} ] }, 
+          ToDo.updateMany({ $and: [{_id:req.params.id}, {collaborators: {"$nin" : foundToken.user._id.toString()}} ] }, 
             {
-              $pull: {collaborators: {username: req.body.username}}
+              $pull: {collaborators: req.body.id}
             }, 
             function(err, result){
-              if(result.nModified == 0)
+              if(err){
+                res.send(err)
+              }
+              else if(result.nModified == 0)
               {
                 res.status(401).send("Collaborators of a task can't add collaborators")
               }
