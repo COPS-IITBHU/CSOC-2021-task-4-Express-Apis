@@ -12,6 +12,19 @@ const getAllToDo = async (req, res) => {
 const createToDo = async (req, res) => {
   // Check for the token and create a todo
   // or throw error correspondingly
+  console.log(req.user);
+  const todo = new ToDo({
+    title: req.body.title,
+    createdBy: req.user.id
+  });
+  console.log(todo);
+  todo.save().then(todo=>res.status(200).json(
+    {
+      id: todo.id,
+      title: todo.title
+    }
+  ));
+
 };
 
 const getParticularToDo = async (req, res) => {
