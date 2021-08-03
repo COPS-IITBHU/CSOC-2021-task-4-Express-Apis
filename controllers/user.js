@@ -65,6 +65,22 @@ const profile = async (req, res) => {
   // Implement the functionality to retrieve the details
   // of the logged in user.
   // Check for the token and then use it to get user details
+  console.log(req.headers);
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.split(' ')[0].toLowerCase() == 'token') {
+    const token = authHeader.split(' ')[1];
+
+    Token.findOne({'token':token},'user',(err,token)=>{
+      User.findById(token.user,'_id name email username',(err,user)=>{
+        res.status(200).json({
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          username: user.username
+        });
+      })
+    });
+  }
 };
 
 module.exports = { login, signup, profile };
