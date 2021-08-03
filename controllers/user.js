@@ -14,6 +14,24 @@ const login = async (req, res) => {
   // Check if data is valid
   // Return correct status codes: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
   // If the user is verified, then return a token along with correct status code
+  console.log(req.body);
+  const body = req.body;
+  if (!(body.username && body.password)) {
+    return res.status(400).send({error: "Missing required fields"});
+  }
+  User.findOne({'username':body.username},'_id password',async (err,user)=>{
+    console.log(user);
+    const match = await bcrypt.compare(body.password,user.password);
+    if (match) {
+      Token.findOne({user:user.id},(err,token)=>{
+        res.status(200).json({token:token.token});
+      })
+    }
+    else {
+      res.status(400).json({error:"Invalid username or password"});
+    }
+  });
+
 };
 
 const signup = async (req, res) => {
