@@ -7,6 +7,13 @@ const { ToDo, Token } = require("../models");
 const getAllToDo = async (req, res) => {
   // Get the token in header.
   // Use the token to get all the ToDo's of a user
+  console.log(req.user);
+  ToDo.find({createdBy:req.user.id},(err,todos)=>{
+    res.status(200).json(todos.map(todo=>({
+      id: todo.id,
+      title: todo.title
+    })));
+  });
 };
 
 const createToDo = async (req, res) => {
