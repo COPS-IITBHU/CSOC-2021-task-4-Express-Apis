@@ -19,7 +19,6 @@ const authenticateToken = (req,res,next) => {
     } else {
         res.sendStatus(401);
     }
-    res.sendStatus(401);
 }
 
 module.exports = authenticateToken
