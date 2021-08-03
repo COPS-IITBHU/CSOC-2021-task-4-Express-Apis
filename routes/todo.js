@@ -9,3 +9,5 @@ router.patch("/:id/",ToDoController.editToDoPatch);
 router.put("/:id/",ToDoController.editToDo);
 router.delete("/:id/",ToDoController.deleteToDo);
 // TODO: Create the end points similarly
+
+module.exports = router;
