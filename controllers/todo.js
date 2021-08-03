@@ -51,12 +51,12 @@ const getParticularToDo = async (req, res, next) => {
     res.status(200).json({ _id: todo._id, title: todo.title });
   } catch (err) {
     if (err.message.match(/Cast to ObjectId failed/))
-      return next(new BackendError(404, "Invalid Id"));
+      return next(new BackendError(400, "Invalid Id"));
     next(err);
   }
 };
 
-const editToDo = async (req, res) => {
+const editToDo = async (req, res, next) => {
   try {
     const { id: todoId } = req.params;
     const { title } = req.body;
@@ -75,12 +75,12 @@ const editToDo = async (req, res) => {
     res.status(200).json({ _id: todo._id, title: todo.title });
   } catch (err) {
     if (err.message.match(/Cast to ObjectId failed/))
-      return next(new BackendError(404, "No Todo with given ID"));
+      return next(new BackendError(400, "Invalid ID"));
     next(err);
   }
 };
 
-const deleteToDo = async (req, res) => {
+const deleteToDo = async (req, res, next) => {
   try {
     const { id: todoId } = req.params;
     const todo = await ToDo.findById(todoId);
@@ -95,7 +95,7 @@ const deleteToDo = async (req, res) => {
     res.status(204).send();
   } catch (err) {
     if (err.message.match(/Cast to ObjectId failed/))
-      return next(new BackendError(404, "Invalid Id"));
+      return next(new BackendError(400, "Invalid Id"));
     next(err);
   }
 };
@@ -119,11 +119,14 @@ const addCollaborator = async (req, res, next) => {
         400,
         "You cannot use your own username as collaborator username"
       );
-    let perm1 = isCreater(todo, req.user._id);
-    if (!perm1)
-      return next(
-        new BackendError(403, "You are not authorized to do this operation")
+
+    if (!isCreater(todo, req.user._id))
+      throw new BackendError(
+        403,
+        "You are not authorized to do this operation"
       );
+    if (isCollaborator(todo, user._id))
+      throw new BackendError(400, "User is already present as collaborator");
 
     const newToDo = await ToDo.findByIdAndUpdate(todoId, {
       $push: { collaborators: user._id },
@@ -131,7 +134,7 @@ const addCollaborator = async (req, res, next) => {
     res.status(200).json({ _id: newToDo._id, title: newToDo.title });
   } catch (err) {
     if (err.message.match(/Cast to ObjectId failed/))
-      return next(new BackendError(404, "Invalid Id"));
+      return next(new BackendError(400, "Invalid Id"));
     next(err);
   }
 };
@@ -155,11 +158,14 @@ const removeCollaborator = async (req, res, next) => {
         400,
         "You cannot use your own username as collaborator username"
       );
-    let perm1 = isCreater(todo, req.user._id);
-    if (!perm1)
-      return next(
-        new BackendError(403, "You are not authorized to do this operation")
+
+    if (!isCreater(todo, req.user._id))
+      throw new BackendError(
+        403,
+        "You are not authorized to do this operation"
       );
+    if (!isCollaborator(todo, user._id))
+      throw new BackendError(400, "User is not present as collaborator");
 
     const newToDo = await ToDo.findByIdAndUpdate(todoId, {
       $pull: { collaborators: user._id },
@@ -167,7 +173,7 @@ const removeCollaborator = async (req, res, next) => {
     res.status(200).json({ _id: newToDo._id, title: newToDo.title });
   } catch (err) {
     if (err.message.match(/Cast to ObjectId failed/))
-      return next(new BackendError(404, "Invalid Id"));
+      return next(new BackendError(400, "Invalid Id"));
     next(err);
   }
 };
