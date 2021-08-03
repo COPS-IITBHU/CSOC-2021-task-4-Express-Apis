@@ -29,6 +29,6 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-userSchema.plugin(uniqueValidator);
+userSchema.plugin(uniqueValidator, { message: "{PATH} must be unique" });
 
 module.exports = model("User", userSchema);

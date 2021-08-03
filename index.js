@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const { ToDoRoutes, UserRoutes } = require("./routes");
+const BackendError = require("./utils/BackendError");
 
 const app = express();
 
@@ -16,9 +17,18 @@ app.disable("x-powered-by");
 
 app.use("/api/auth", UserRoutes);
 app.use("/api/todo", ToDoRoutes);
+app.use("*", (req, res, next) => {
+  next(new BackendError(404, "No such endpoint exists"));
+});
+app.use((err, req, res, next) => {
+  const { message = "An error occurred", statusCode = 500 } = err;
+  if (typeof message === "string")
+    return res.status(statusCode).send({ message });
+  res.status(statusCode).send({ ...message });
+});
 
 const PORT = process.env.PORT || 8000;
-const mongoDB = "mongodb://127.0.0.1/my_database";
+const mongoDB = process.env.DB_URL || "mongodb://127.0.0.1/my_database";
 
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
