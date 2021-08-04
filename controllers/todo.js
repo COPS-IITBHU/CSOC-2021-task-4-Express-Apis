@@ -1,4 +1,4 @@
-const { ToDo, Token } = require("../models");
+const { ToDo, Token, User } = require("../models");
 
 // All the given method require token.
 // So be sure to check for it before doing any stuff
@@ -72,6 +72,43 @@ const deleteToDo = async (req, res) => {
   })
 };
 
+const addCollaborators = async(req,res)=> {
+  // Add Collaborators to todo with given id
+  const collaborators = req.body.collaborators;
+  ToDo.findById(req.params.id,(err,todo)=>{
+    if(err) {
+      console.log(err);
+      return;
+    }
+    if(todo.createdBy == req.user.id) {
+      User.find({username: {$in:collaborators}},'_id username',(err,collabs)=>{
+        let invalidUsers = []
+        if(collabs.length != collaborators.length) {
+          collaborators.forEach(collaborator=>{
+            if(!collabs.includes(collaborator.username)){
+              invalidUsers.push(collaborator.username);
+            }
+          })
+        }
+        if(todo.collaborator) {
+          todo.collaborators.concat(collabs.map(collab=>collab.id));
+        } else {
+          todo.collaborators = collabs.map(collab=>collab.id);
+        }
+        todo.save().then(_ => {
+          if (invalidUsers.length==0) {
+            res.sendStatus(200);
+          } else {
+            res.status(404).json({
+              invalid_users:invalidUsers
+            })
+          }
+        })
+      })
+    }
+  })
+};
+
 module.exports = {
   createToDo,
   deleteToDo,
@@ -79,4 +116,5 @@ module.exports = {
   editToDoPatch,
   getAllToDo,
   getParticularToDo,
+  addCollaborators,
 };
