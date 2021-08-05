@@ -8,6 +8,11 @@ if (process.env.NODE_ENV !== "production") {
   require('dotenv').config();
 }
 
+var port = process.env.PORT;
+if (port == null || port == "") {
+  port = 8000;
+}
+
 app.use(json());
 app.use(urlencoded({ extended: true }));
 app.use(cors());
@@ -17,8 +22,6 @@ app.disable("x-powered-by");
 
 app.use("/api/auth", UserRoutes);
 app.use("/api/todo", ToDoRoutes);
- 
-const PORT = process.env.PORT || 8000;
 const mongoDB = process.env.MONGODB_URL;
 
 mongoose.set("useFindAndModify", false);
@@ -26,8 +29,8 @@ mongoose.set("useCreateIndex", true);
 mongoose
   .connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
     });
   })
   .catch((err) => console.log(err.message));    
