@@ -9,6 +9,7 @@ router.patch("/:id/",ToDoController.editToDoPatch);
 router.put("/:id/",ToDoController.editToDo);
 router.delete("/:id/",ToDoController.deleteToDo);
 router.patch("/:id/add-collaborators/",ToDoController.addCollaborators);
+router.patch("/:id/remove-collaborator/",ToDoController.removeCollaborator);
 // TODO: Create the end points similarly
 
 module.exports = router;

@@ -109,6 +109,24 @@ const addCollaborators = async(req,res)=> {
   })
 };
 
+const removeCollaborator = async (req,res)=>{
+  console.log(req.params.id);
+  console.log(req.body);
+  ToDo.findById(req.params.id,(err,todo)=>{
+    if (todo.createdBy != req.user.id) {
+      return res.sendStatus(401);
+    }
+    User.findOne({username:req.body.collaborator},(err,user)=>{
+      if(!todo.collaborators.includes(user.id)) {
+        return res.sendStatus(404);
+      }
+      todo.collaborators.splice(todo.collaborators.indexOf(user.id),1);
+      console.log(todo);
+      todo.save().then(_=>res.send(200));
+    });
+  });
+}
+
 module.exports = {
   createToDo,
   deleteToDo,
@@ -117,4 +135,5 @@ module.exports = {
   getAllToDo,
   getParticularToDo,
   addCollaborators,
+  removeCollaborator,
 };
