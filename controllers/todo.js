@@ -14,21 +14,27 @@ const getAllToDo = async (req, res) => {
         {createdBy:req.user.id},
         {collaborators:req.user.id}
       ]
-  }
-    ,(err,todos)=>{
+  },
+  '_id title createdBy',
+  (err,todos)=>{
     const createdTodos = todos.filter(todo=>todo.createdBy==req.user.id);
     const collabTodos = todos.filter(todo=>todo.createdBy!=req.user.id);
-    res.status(200).json({
-      created:createdTodos.map(todo=>({
-        id: todo.id,
-        title: todo.title
-      })),
-      collab:collabTodos.map(todo=>({
-        id: todo.id,
-        title: todo.title
-      }))
-    }
-    );
+    User.find({_id: {$in: collabTodos.map(todo=>todo.createdBy)}},'_id username',(err,creators)=>{
+      console.log(creators);
+      res.status(200).json({
+        createdTodos:createdTodos.map(todo=>({
+          id: todo.id,
+          title: todo.title
+        })),
+        collabTodos:collabTodos.map(todo=>({
+          id: todo.id,
+          title: todo.title,
+          createdBy: creators.find(creator => creator.id == todo.createdBy).username
+        }))
+      }
+      );
+    });
+    
   });
 };
 
