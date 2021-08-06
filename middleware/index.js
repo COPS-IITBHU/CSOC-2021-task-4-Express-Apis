@@ -14,7 +14,7 @@ const checkAuth= async function(req,res,next) {
             }
             })
     }else{
-        res.status(401).send("Please login first to get the user profile.")
+        res.status(401).send("Authentication token not found.")
     }
     
   }
