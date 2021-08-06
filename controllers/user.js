@@ -13,18 +13,18 @@ const createToken = (user) => {
 
 
 const login = async (req, res) => {
-  // TODO: Read username, pwd from the req object
+  // TODO: Read username, password from the req object
   // Return correct status codes: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
   // If the user is verified, then return a token along with correct status code
   
   try{
-    const {username,pwd} = req.body
-    if (!(username&&pwd)){
+    const {username,password} = req.body
+    if (!(username&&password)){
       return res.send(400).send("Please fill all the fields.")
     }
     User.findOne({username: username},async function(err, foundUser){
       if(foundUser){ 
-        const passIsCorrect = await bcrypt.compare(pwd, foundUser.password)
+        const passIsCorrect = await bcrypt.compare(password, foundUser.password)
         if(!passIsCorrect){
           return res.status(403).send("Password is incorrect.Please enter correct password to login.")
         }
@@ -44,15 +44,15 @@ const login = async (req, res) => {
 
 const signup = async (req, res) => {
   
-  // TODO: Read username, email, name, pwd from the req object
+  // TODO: Read username, email, name, password from the req object
   // Hash the password
   // Return with appropriate status code in case of an error
   // If successful, return with an appropriate token along with correct status code
 
   try{   
 
-    const {username,email,name,pwd}=req.body
-    if(!(username&&email&&name&&pwd)){
+    const {username,email,name,password}=req.body
+    if(!(username&&email&&name&&password)){
       
       return res.status(400).send("Please fill in all the fields.")
     }
@@ -63,7 +63,7 @@ const signup = async (req, res) => {
     });
     
 
-    const hashedPassword = await bcrypt.hash(pwd, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create(
       { 
@@ -90,12 +90,6 @@ const profile = async (req, res) => {
   // Implement the functionality to retrieve the details
   // of the logged in user.
   // Check for the token and then use it to get user details
-  // {
-  //   "id":  1,
-  //   "name":  "string",
-  //   "email":  "user@example.com",
-  //   "username":  "string"
-  // }
  
   const user = req.user
   const {id,name,email,username}= user
@@ -107,6 +101,7 @@ const profile = async (req, res) => {
   })
 
 };
+
 
 
 module.exports = { login, signup, profile};
