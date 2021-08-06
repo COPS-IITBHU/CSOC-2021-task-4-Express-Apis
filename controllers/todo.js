@@ -7,9 +7,22 @@ const { ToDo, Token } = require("../models");
 const getAllToDo = async (req, res) => {
     
   const user = req.user
-  ToDo.find({createdBy:user._id},{title:1},function(err,foundTodos){
+  ToDo.find({$or: [{createdBy:user._id},{collaborators:user._id}]},{title:1,createdBy:1},function(err,foundTodos){
     if(!err && foundTodos.length > 0){
-      res.status(200).json(foundTodos)
+
+      let todosOfUser=[]
+      let todosCollaboratedTo=[]
+      foundTodos.forEach(function(todo){
+        if(todo.createdBy==user.id){
+          todosOfUser.push({"id":todo._id,"title":todo.title})
+        }else{
+          todosCollaboratedTo.push({"id":todo._id,"title":todo.title})
+        }
+      })
+      res.status(200).json({
+        "todosOfUser":todosOfUser,
+        "todosCollaboratedTo":todosCollaboratedTo
+      })
     }else{
       res.status(200).json([])
     }
@@ -47,7 +60,6 @@ const getParticularToDo = async (req, res) => {
   const {id}=req.params
   const user=req.user
 
-  // {$or: [{_id:id,createdBy:user._id},{_id:id,collaborators:user._id}]}
   ToDo.findOne({$or: [{_id:id,createdBy:user._id},{_id:id,collaborators:user._id}]},function(err,foundTodo){
     if(err) { console.log(err)}
     if(foundTodo){
