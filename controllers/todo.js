@@ -8,11 +8,27 @@ const getAllToDo = async (req, res) => {
   // Get the token in header.
   // Use the token to get all the ToDo's of a user
   console.log(req.user);
-  ToDo.find({createdBy:req.user.id},(err,todos)=>{
-    res.status(200).json(todos.map(todo=>({
-      id: todo.id,
-      title: todo.title
-    })));
+  ToDo.find(
+    {
+      $or: [
+        {createdBy:req.user.id},
+        {collaborators:req.user.id}
+      ]
+  }
+    ,(err,todos)=>{
+    const createdTodos = todos.filter(todo=>todo.createdBy==req.user.id);
+    const collabTodos = todos.filter(todo=>todo.createdBy!=req.user.id);
+    res.status(200).json({
+      created:createdTodos.map(todo=>({
+        id: todo.id,
+        title: todo.title
+      })),
+      collab:collabTodos.map(todo=>({
+        id: todo.id,
+        title: todo.title
+      }))
+    }
+    );
   });
 };
 
