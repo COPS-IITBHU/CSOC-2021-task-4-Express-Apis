@@ -14,10 +14,13 @@ const getAllToDo = async (req, res) => {
       { createdBy: req.user },
       { collaborators: { $all: [req.user] } }
     ]
-  })
+  } )
+  // .populate('collaborators')
     .then((result) => {
-      if (result.length != 0)
+      if (result.length != 0){
+        //  collaborators = collaborators.username
         res.status(200).send(result)
+      }
       else
         res.status(404).send("No todos available")
     })

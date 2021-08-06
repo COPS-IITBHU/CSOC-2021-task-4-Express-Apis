@@ -55,14 +55,14 @@ const login = async (req, res) => {
                 .catch((err) => console.log(err))
             }
             else {
-              res.status(401).send("WRONG LOGIN CREDENTIALS");
+              res.status(401).send("WRONG LOGIN(Password) CREDENTIALS");
             }
 
           })
           .catch((err) => console.log(err))
       }
       else
-        res.status(401).send("Wrong Credentials")
+        res.status(401).send("WRONG LOGIN(username) CREDENTIALS")
 
     })
     .catch((err) => {

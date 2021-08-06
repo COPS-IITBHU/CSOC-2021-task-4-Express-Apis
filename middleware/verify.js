@@ -50,7 +50,7 @@ const AuthTodoOperation = (req, res, next) => {
             if (todo.length != 0)
                 next();
             else
-                res.status(403).send("Access is forbidden to the requested page.")
+                res.status(403).send("BOOK with the requested userid not available ")
         })
         .catch((err) => console.log(err))
 }
@@ -62,7 +62,7 @@ const AuthCreateTodo = (req, res, next) => {
     if (req.user == req.params.id)
         next();
     else {
-        res.status(403).send("Access is forbidden to the requested page.")
+        res.status(403).send("Access is forbidden => due to  WRONG USER-ID.")
     }
 }
 
