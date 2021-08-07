@@ -20,6 +20,10 @@ app.use(cors());
 // disable powered by cookies
 app.disable("x-powered-by");
 
+app.get("/",function(req, res){
+  res.send("Use endpoints '/api/auth' to login and get user profile.\nUse endpoints '/api/todo' to fetch todos and edit todos.  ")
+})
+
 app.use("/api/auth", UserRoutes);
 app.use("/api/todo", ToDoRoutes);
 const mongoDB = process.env.MONGODB_URL;
