@@ -4,37 +4,24 @@ const router = Router();
 
 const { requireAuth, AuthTodoOperation, AuthCreateTodo, AuthColabPermissions } = require('../middleware/verify');
 
+router.use(requireAuth)    // checks whether user is login
 
-router.get("/", requireAuth, ToDoController.getAllToDo);
-router.post("/:id/", requireAuth, AuthCreateTodo, ToDoController.createToDo);  // id of user
+router.get("/",  ToDoController.getAllToDo);
+router.post("/:id/",  AuthCreateTodo, ToDoController.createToDo);  // id of user
 
 // TODO: Create the end points similarly
 
 
-router.get("/:id/", requireAuth, ToDoController.getParticularToDo);   // id  of todo
-// router.use(checkUser)
-router.patch("/:id/", requireAuth, AuthTodoOperation, ToDoController.editToDoPatch);     // id  of todo      
-router.put("/:id/", requireAuth, AuthTodoOperation, ToDoController.editToDo);          // id  of todo
-router.delete("/:id/", requireAuth, AuthTodoOperation, ToDoController.deleteToDo);        // id  of todo
+router.get("/:id/", ToDoController.getParticularToDo);   // id  of todo
+
+router.patch("/:id/", AuthTodoOperation, ToDoController.editToDoPatch);     // id  of todo      
+router.put("/:id/",  AuthTodoOperation, ToDoController.editToDo);          // id  of todo
+router.delete("/:id/",  AuthTodoOperation, ToDoController.deleteToDo);        // id  of todo
 
 
 // collabrators
-router.put("/:id/add-collaborators/", requireAuth, AuthColabPermissions, ToDoController.addCollaborators);
-router.put("/:id/remove-collaborators/", requireAuth, AuthColabPermissions, ToDoController.removeCollaborators);
+router.patch("/:id/add-collaborators/",  AuthColabPermissions, ToDoController.addCollaborators);
+router.patch("/:id/remove-collaborators/", AuthColabPermissions, ToDoController.removeCollaborators);
 
 
 module.exports = router;
-
-
-// Endpoints for collaborators
-
-// Request Body Sample 
-// {
-//     "username":"<username of collaborator>"
-// }
-
-
-// Request Body Sample 
-// {
-//     "username":"<username of collaborator>"
-// }

@@ -45,24 +45,27 @@ const login = async (req, res) => {
           .then((auth) => {
             if (auth) {
 
-              Token.find({ user: user._id, })
+              Token.findOne({ user: user._id, }, 
+                 { createdAt: 0, updatedAt: 0 ,__v:0} )
 
                 .then((result) => {
-                  if (result.length != 0)
-                    res.status(201).send([{ user, result }])
-
+                  if (result)
+                    res.status(200).send({
+                      "username":user.username,
+                      "token":result.token
+                    })
                 })
                 .catch((err) => console.log(err))
             }
             else {
-              res.status(401).send("WRONG LOGIN(Password) CREDENTIALS");
+              res.status(400).send("WRONG LOGIN(Password) CREDENTIALS");
             }
 
           })
           .catch((err) => console.log(err))
       }
       else
-        res.status(401).send("WRONG LOGIN(username) CREDENTIALS")
+        res.status(400).send("WRONG LOGIN(username) CREDENTIALS")
 
     })
     .catch((err) => {
@@ -81,7 +84,11 @@ const signup = async (req, res) => {
   User.create(req.body)
     .then((user) => {
       const token = createToken(user)        // crypto
-        .then((result) => res.status(201).send([{ user, result }]))
+        .then((result) => res.status(200).send({
+          "username":user.username,
+          "token":result.token
+        }) 
+        )
         .catch((err) => console.log(err))
 
     })
@@ -99,7 +106,7 @@ const profile = async (req, res) => {
   // Check for the token and then use it to get user details
 
   User.findById(req.user, { password: false })      // id = req.user
-    .then((user) => res.send(user))
+    .then((user) => res.status(200).send(user))
     .catch((err) => console.log(err))
 
 };

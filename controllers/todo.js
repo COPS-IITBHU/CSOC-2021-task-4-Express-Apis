@@ -14,15 +14,17 @@ const getAllToDo = async (req, res) => {
       { createdBy: req.user },
       { collaborators: { $all: [req.user] } }
     ]
-  } )
-  // .populate('collaborators')
+  }, { createdAt: 0, updatedAt: 0, __v: 0 })
+    // .populate('createdBy', 'username )
+    .populate({ path: 'createdBy', select: 'username -_id' })
+    .populate({ path: 'collaborators', select: 'username -_id' })
+
     .then((result) => {
-      if (result.length != 0){
-        //  collaborators = collaborators.username
-        res.status(200).send(result)
+      if (result.length != 0) {
+        res.status(200).status(200).send(result)
       }
       else
-        res.status(404).send("No todos available")
+        res.status(200).send("No todos available")
     })
     .catch((err) => console.log(err))
 };
@@ -31,20 +33,32 @@ const createToDo = async (req, res) => {
   // Check for the token and create a todo
   // or throw error correspondingly
 
-  let todo = {
-    title: req.body.title,
-    createdBy: req.params.id
+  if (req.body.title) {
+    let todo = {
+      title: req.body.title,
+      createdBy: req.params.id
+    }
+    ToDo.create(todo)
+      .then((newTodo) => res.status(200).send(newTodo))
+      .catch((err) => console.log(err))
   }
-  ToDo.create(todo)
-    .then((newTodo) => res.status(201).send(newTodo))
-    .catch((err) => console.log(err))
+  else
+    res.status(400).send("Title is rquired")
 };
 
 const getParticularToDo = async (req, res) => {
   // Get the Todo of the logged in user with given id.
 
-  ToDo.findById(req.params.id)
-    .then((result) => res.status(200).send(result))
+  ToDo.findById(req.params.id, { createdAt: 0, updatedAt: 0 })
+    .populate({ path: 'createdBy', select: 'username -_id' })
+    .populate({ path: 'collaborators', select: 'username -_id' })
+    .then((sinleTodo) => {
+      if (sinleTodo)
+        res.status(200).send(sinleTodo)
+      else
+        res.status(200).send("No todo available with the requested book id. you might have entered wrong bookid")
+    }
+    )
     .catch((err) => console.log(err))
 
 };
@@ -55,7 +69,9 @@ const editToDo = async (req, res) => {
   ToDo.findByIdAndUpdate(req.params.id, { title: req.body.title })
     .then(() => {
 
-      ToDo.findOne({ _id: req.params.id })
+      ToDo.findOne({ _id: req.params.id },)
+        .populate({ path: 'createdBy', select: 'username -_id' })
+        .populate({ path: 'collaborators', select: 'username -_id' })
         .then((updatedTodo) => res.status(200).send(updatedTodo))
 
     })
@@ -69,6 +85,8 @@ const editToDoPatch = async (req, res) => {
     .then(() => {
 
       ToDo.findOne({ _id: req.params.id })
+        .populate({ path: 'createdBy', select: 'username -_id' })
+        .populate({ path: 'collaborators', select: 'username -_id' })
         .then((updatedTodo) => res.status(200).send(updatedTodo))
 
     })
@@ -80,7 +98,12 @@ const deleteToDo = async (req, res) => {
   //  Delete the todo with given id
 
   ToDo.findByIdAndDelete(req.params.id)
-    .then((result) => res.status(204).send("DELETED SUCESSFULLY"))
+    .then((dlt) => {
+
+        res.status(204).send("DELETED SUCESSFULLY")
+      
+    }
+    )
     .catch((err) => console.log(err))
 };
 
@@ -95,7 +118,7 @@ const addCollaborators = async (req, res) => {
     .then((user) => {
 
       if (!user) {
-        res.send("Username does not exits")
+        res.status(400).send("Username does not exits")
       }
 
       else {
@@ -107,6 +130,9 @@ const addCollaborators = async (req, res) => {
               .then(() => {
 
                 ToDo.findOne({ _id: req.params.id })
+
+                  .populate({ path: 'createdBy', select: 'username -_id' })
+                  .populate({ path: 'collaborators', select: 'username -_id' })
                   .then((todo) => res.status(201).send(todo))
 
               })
@@ -139,13 +165,18 @@ const removeCollaborators = async (req, res) => {
               res.send("No such collaborator exits in todo")
 
             ToDo.findByIdAndUpdate(req.params.id, { collaborators: result.collaborators }, () => {
-              res.status(200).send("collaborator deleted")
+
+              ToDo.findOne({ _id: req.params.id })
+
+                .populate({ path: 'createdBy', select: 'username -_id' })
+                .populate({ path: 'collaborators', select: 'username -_id' })
+                .then((todo) => res.status(200).send(todo))
             })
 
           })
       }
       else
-        res.send("No such collaborator exits in todo")
+        res.status(400).send("No such collaborator exits in todo")
 
     })
 

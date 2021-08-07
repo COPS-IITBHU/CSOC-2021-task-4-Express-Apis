@@ -6,6 +6,8 @@ const { User, Token, ToDo } = require("../models");
 
 const requireAuth = (req, res, next) => {
 
+    // checks user is login or not
+
     const tokenHeader = req.headers['authorization']
 
     if (typeof tokenHeader !== 'undefined') {
@@ -29,7 +31,7 @@ const requireAuth = (req, res, next) => {
 
     }
     else {
-        res.status(401).send("The requested page needs a username and a password or a token");
+        res.status(401).send("The requested page needs a username and a password and a token in authorization header");
 
     }
 
@@ -37,6 +39,8 @@ const requireAuth = (req, res, next) => {
 
 
 const AuthTodoOperation = (req, res, next) => {
+
+    //  For editing and deleting todos by only creator of the todo and its collaborators
 
     ToDo.find({
         _id: req.params.id,
@@ -50,7 +54,7 @@ const AuthTodoOperation = (req, res, next) => {
             if (todo.length != 0)
                 next();
             else
-                res.status(403).send("BOOK with the requested userid not available ")
+                res.status(403).send("BOOK with the requested bookid not available ")
         })
         .catch((err) => console.log(err))
 }
@@ -62,16 +66,18 @@ const AuthCreateTodo = (req, res, next) => {
     if (req.user == req.params.id)
         next();
     else {
-        res.status(403).send("Access is forbidden => due to  WRONG USER-ID.")
+        res.status(400).send("Wrong user id.")
     }
 }
 
 
-const AuthColabPermissions = (req, res, next) => {
+const AuthColabPermissions = (req, res, next) => {  
+    
+    //  For adding and removing collaborators by only creator of the todo
 
     ToDo.find({
-        _id: req.params.id,   // checks todo exits or not
-        createdBy: req.user      // to chxk which  user created 
+        _id: req.params.id,   
+        createdBy: req.user     
     })
         .then((todo) => {    // todo is an array
 
