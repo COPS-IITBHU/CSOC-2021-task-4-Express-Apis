@@ -26,7 +26,7 @@ const mongoDB = "mongodb://127.0.0.1/my_database";
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
 mongoose
-  .connect('mongodb+srv://Ksathwik03:Ksathwik03@cluster0.xtzux.mongodb.net/todo?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
