@@ -70,9 +70,21 @@ const signup = async (req, res) => {
         createToken(user).save().then(tokenObject=>{
           res.status(200).json({token:tokenObject.token});
         })
-      })
-    })
-  })
+      }).catch(err=>{
+       if (err.errors.username && err.errors.username.kind=='unique') {
+         return res.status(409).json({
+           error: "username already in use"
+         });
+       }
+       if (err.errors.email && err.errors.email.kind == 'unique') {
+         return res.status(409).json({
+           error: "email already in use"
+         });
+       }
+       res.sendStatus(500);
+      });
+    });
+  });
 
 };
 
