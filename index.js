@@ -19,6 +19,8 @@ app.use("/api/todo", ToDoRoutes);
 
 const PORT = process.env.PORT || 8000;
 const mongoDB = "mongodb://127.0.0.1/my_database";
+// const mongoDB = process.env.DB_URL || "mongodb://127.0.0.1/my_database";
+
 
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
@@ -30,3 +32,9 @@ mongoose
     });
   })
   .catch((err) => console.log(err.message));
+
+
+app.use((req, res, next) => {
+  res.status(404).send("404 Not Found")
+  next();
+})
