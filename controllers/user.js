@@ -21,6 +21,10 @@ const login = async (req, res) => {
   }
   User.findOne({'username':body.username},'_id password',async (err,user)=>{
     console.log(user);
+    console.log(err);
+    if (user == null){
+      return res.status(401).json({error:"Invalid username or password"});
+    }
     const match = await bcrypt.compare(body.password,user.password);
     if (match) {
       Token.findOne({user:user.id},(err,token)=>{
@@ -28,7 +32,7 @@ const login = async (req, res) => {
       })
     }
     else {
-      res.status(400).json({error:"Invalid username or password"});
+      res.status(401).json({error:"Invalid username or password"});
     }
   });
 
@@ -44,7 +48,7 @@ const signup = async (req, res) => {
   if(!(body.email && body.password && body.name && body.username)) {
     return res.status(400).send({error: "Missing required fields"});
   }
-
+  
   const user = new User(body);
 
   bcrypt.genSalt(10).then(salt=>{
