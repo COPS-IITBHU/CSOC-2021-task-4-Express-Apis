@@ -19,6 +19,9 @@ app.use("/api/todo", ToDoRoutes);
 
 const PORT = process.env.PORT || 8000;
 const mongoDB = "mongodb://127.0.0.1/my_database";
+// app.post('/signup', (req,res) => {
+//   console.log(req.body)
+// })
 
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
