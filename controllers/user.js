@@ -83,11 +83,23 @@ const profile = async (req, res) => {
   // Check for the token and then use it to get user details
   console.log(req.headers);
   const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.split(' ')[0].toLowerCase() == 'token') {
+  if (authHeader && 
+    authHeader.split(' ')[0].toLowerCase() == 'token' &&
+    authHeader.split(' ').length == 2) {
     const token = authHeader.split(' ')[1];
 
     Token.findOne({'token':token},'user',(err,token)=>{
+      if (token==null){
+        return res.status(401).json({
+          error: "Invalid Token"
+        });
+      }
       User.findById(token.user,'_id name email username',(err,user)=>{
+        if (user == null) {
+          return res.status(404).json({
+            error: "User Not Found"
+          });
+        }
         res.status(200).json({
           id: user.id,
           name: user.name,
@@ -96,6 +108,8 @@ const profile = async (req, res) => {
         });
       })
     });
+  } else {
+    return res.sendStatus(401);
   }
 };
 
