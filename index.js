@@ -20,7 +20,7 @@ app.use(cors());
 // disable powered by cookies
 app.disable("x-powered-by");
 
-app.get("/",function(req, res){
+app.get("/api",function(req, res){
   res.json({"Details: " :"Use endpoints '/api/auth/login' and '/api/auth/signup' to login,signup and get user profile.\nUse endpoints '/api/todo' to fetch todos and edit todos."})
 })
 
