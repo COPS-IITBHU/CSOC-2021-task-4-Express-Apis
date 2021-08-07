@@ -19,11 +19,14 @@ app.use("/api/todo", ToDoRoutes);
 
 const PORT = process.env.PORT || 8000;
 const mongoDB = "mongodb://127.0.0.1/my_database";
+// app.post('/signup', (req,res) => {
+//   console.log(req.body)
+// })
 
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
 mongoose
-  .connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect('mongodb+srv://Ksathwik03:Ksathwik03@cluster0.xtzux.mongodb.net/todo?retryWrites=true&w=majority', { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
