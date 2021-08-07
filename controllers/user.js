@@ -1,5 +1,6 @@
 const { User, Token } = require("../models");
 const { randomBytes } = require("crypto");
+const { validate } = require("../utils");
 const bcrypt = require("bcrypt");
 
 const createToken = (user) => {
@@ -48,9 +49,20 @@ const signup = async (req, res) => {
   if(!(body.email && body.password && body.name && body.username)) {
     return res.status(400).send({error: "Missing required fields"});
   }
-  
-  const user = new User(body);
+  if (!validate.isValidEmail(body.email)) {
+    return res.status(400).send({error:"Invalid Email"});
+  }
+  if (!validate.isValidUsername(body.username)) {
+    return res.status(400).send({error:"Invalid Username"});
+  }
+  if (!validate.isValidPassword(body.password)) {
+    return res.status(400).send({error:"Invalid Password"});
+  }
+  if (!validate.isValidName(body.name)) {
+    return res.status(400).send({error: "Invalid Name"});
+  }
 
+  const user = new User(body);
   bcrypt.genSalt(10).then(salt=>{
     bcrypt.hash(user.password,salt).then(hashedPassword =>{
       user.password = hashedPassword;
