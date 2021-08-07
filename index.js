@@ -21,7 +21,7 @@ app.use(cors());
 app.disable("x-powered-by");
 
 app.get("/",function(req, res){
-  res.send("Use endpoints '/api/auth' to login and get user profile.\nUse endpoints '/api/todo' to fetch todos and edit todos.  ")
+  res.json({"Details: " :"Use endpoints '/api/auth/login' and '/api/auth/signup' to login and get user profile.\nUse endpoints '/api/todo' to fetch todos and edit todos."})
 })
 
 app.use("/api/auth", UserRoutes);
