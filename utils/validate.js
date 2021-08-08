@@ -32,10 +32,28 @@ const validateParams = (req,res,next) => {
     }
     next();
 }
+
+const validateBody = (schema) => (req,res,next) => {
+    for(let key in schema) {
+        if (!req.body[key]) {
+            return res.status(400).json({
+                error: `Missing required field '${key}'`
+            });
+        }
+        if (typeof(req.body[key]) != schema[key]) {
+            return res.status(400).json({
+                error: `'${key}' must be of type '${schema[key]}'`
+            });
+        }
+    }
+    next();
+}
+
 module.exports = {
     isValidUsername,
     isValidPassword,
     isValidEmail,
     isValidName,
-    validateParams
+    validateParams,
+    validateBody
 }
