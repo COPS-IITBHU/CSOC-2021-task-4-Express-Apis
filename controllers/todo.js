@@ -29,6 +29,10 @@ const getAllToDo = async (req, res) => {
       },
         '_id username',
         (err, creators) => {
+          if (err) {
+            console.log(err);
+            return res.sendStatus(500);
+          }
           console.log(creators);
           res.status(200).json({
             createdTodos: createdTodos.map(todo => ({

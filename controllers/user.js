@@ -101,6 +101,10 @@ const profile = async (req, res) => {
     const token = authHeader.split(' ')[1];
 
     Token.findOne({'token':token},'user',(err,token)=>{
+      if(err) {
+        console.log(err);
+        res.sendStatus(500);
+      }
       if (token==null){
         return res.status(401).json({
           error: "Invalid Token"
@@ -118,7 +122,7 @@ const profile = async (req, res) => {
           email: user.email,
           username: user.username
         });
-      })
+      });
     });
   } else {
     return res.sendStatus(401);
