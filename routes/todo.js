@@ -4,12 +4,12 @@ const {validate} = require("../utils");
 const router = Router();
 
 router.get("/", ToDoController.getAllToDo);
-router.use('/:id/',validate.validateParams);
-router.get("/:id/", ToDoController.getParticularToDo);
 router.post("/create/",
 validate.validateBody({
     title: "string"
 }),ToDoController.createToDo);
+router.use('/:id/',validate.validateParams);
+router.get("/:id/", ToDoController.getParticularToDo);
 
 router.patch("/:id/",
 validate.validateBody({
