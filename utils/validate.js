@@ -1,4 +1,4 @@
-
+const mongoose = require('mongoose');
 const isValidUsername = (username) =>{
     const usernameRegex = /^[\w.@+-]{1,150}$/gm
     if (typeof(username) != 'string') {
@@ -24,10 +24,18 @@ const isValidName = (name) => {
 
     return typeof(name) == 'string' && name.length >=1
 }
-
+const validateParams = (req,res,next) => {
+    if (req.params.id && !mongoose.isValidObjectId(req.params.id)) {
+        return res.status(400).json({
+            error: "Invalid Id"
+        });
+    }
+    next();
+}
 module.exports = {
     isValidUsername,
     isValidPassword,
     isValidEmail,
-    isValidName
+    isValidName,
+    validateParams
 }

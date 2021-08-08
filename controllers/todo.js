@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const { ToDo, Token, User } = require("../models");
 
 // All the given method require token.
@@ -52,7 +53,8 @@ const createToDo = async (req, res) => {
   console.log(req.user);
   const todo = new ToDo({
     title: req.body.title,
-    createdBy: req.user.id
+    createdBy: req.user.id,
+    collaborators: []
   });
   console.log(todo);
   todo.save().then(todo => res.status(200).json(
@@ -70,7 +72,7 @@ const createToDo = async (req, res) => {
 const getParticularToDo = async (req, res) => {
   // Get the Todo of the logged in user with given id.
   console.log(req.user);
-  ToDo.findById(req.params.id, '_id title', (err, todo) => {
+  ToDo.findById(req.params.id, '_id title collaborators createdBy', (err, todo) => {
     if (err) {
       console.log(err);
       return res.sendStatus(500);
@@ -78,15 +80,30 @@ const getParticularToDo = async (req, res) => {
     if (todo == null) {
       return res.sendStatus(404);
     }
-    if (todo.createdBy != req.user.id && !todo.collaborators.includes(req.user.id)) {
+    if (todo.createdBy != req.user.id && 
+      !(todo.collaborators && todo.collaborators.includes(req.user.id))) {
       return res.sendStatus(403);
     }
-    res.status(200).json(
-      {
-        id: todo.id,
-        title: todo.title
+    
+    User.find({
+        $or: [
+        {_id: {$in: todo.collaborators }},
+        {_id: todo.createdBy}
+      ]
+    },(err,users)=>{
+      if (err || users == null) {
+        res.sendStatus(500);
       }
-    );
+      let creator = users.splice(users.findIndex(user=>user.id == todo.createdBy),1)[0];
+      res.status(200).json(
+        {
+          id: todo.id,
+          title: todo.title,
+          createdBy: creator.username,
+          collaborators: users.map(user=>user.username)
+        }
+      );
+    })
   });
 };
 
@@ -139,45 +156,55 @@ const deleteToDo = async (req, res) => {
   })
 };
 
-const addCollaborators = async (req, res) => {
+const addCollaborator = async (req, res) => {
   // Add Collaborators to todo with given id
-  const collaborators = req.body.collaborators;
-  ToDo.findById(req.params.id, (err, todo) => {
+  const collaborator = req.body.collaborator;
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({
+      error: "Invalid todo id"
+    });
+  }
+  ToDo.findById( req.params.id, (err, todo) => {
     if (err) {
       console.log(err);
       return res.sendStatus(500);
     }
+    console.log(todo);
     if (todo == null) {
       return res.sendStatus(404);
     }
     if (todo.createdBy != req.user.id) {
       return res.sendStatus(403);
     }
-    User.find({ username: { $in: collaborators } }, '_id username', (err, collabs) => {
-      let invalidUsers = []
-      if (collabs.length != collaborators.length) {
-        collaborators.forEach(collaborator => {
-          if (!collabs.includes(collaborator.username)) {
-            invalidUsers.push(collaborator.username);
-          }
-        })
+    User.findOne({username : collaborator}, '_id username', (err,collab)=>{
+      if (err) {
+        console.log(err);
+        return res.sendStatus(500);
       }
-      if (todo.collaborator) {
-        todo.collaborators.concat(collabs.map(collab => collab.id));
+      console.log(collab);
+      if (collab == null) {
+        return res.status(404).json({
+          error: "User not found"
+        });
+      }
+      if (collab.id == req.user.id) {
+        return res.status(422).json({
+          error: "Creator cannot be added as collaborator"
+        });
+      }
+      if (todo.collaborators && todo.collaborators.includes(collab.id)) {
+        return res.status(409).json({
+          error: "User is already a collaborator"
+        });
+      }
+      if (todo.collaborators) {
+        todo.collaborators.push(collab.id);
       } else {
-        todo.collaborators = collabs.map(collab => collab.id);
+        todo.collaborators = [collab.id];
       }
-      todo.save().then(_ => {
-        if (invalidUsers.length == 0) {
-          res.sendStatus(200);
-        } else {
-          res.status(404).json({
-            invalid_users: invalidUsers
-          })
-        }
-      })
-    })
-  })
+      todo.save().then(res.sendStatus(200)).catch(_ => res.sendStatus(500));
+    });
+  });
 };
 
 const removeCollaborator = async (req, res) => {
@@ -213,7 +240,7 @@ const removeCollaborator = async (req, res) => {
       }
       todo.collaborators.splice(todo.collaborators.indexOf(user.id), 1);
       console.log(todo);
-      todo.save().then(_ => res.send(200)).catch(_ => res.sendStatus(500));
+      todo.save().then(_ => res.sendStatus(200)).catch(_ => res.sendStatus(500));
     });
   });
 }
@@ -225,6 +252,6 @@ module.exports = {
   editToDoPatch,
   getAllToDo,
   getParticularToDo,
-  addCollaborators,
+  addCollaborator,
   removeCollaborator,
 };
