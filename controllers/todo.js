@@ -135,7 +135,7 @@ const editToDoPatch = async (req, res) => {
 
 const deleteToDo = async (req, res) => {
   //  Delete the todo with given id
-  ToDo.findByIdAndDelete(req.params.id, (err, todo) => {
+  ToDo.findById(req.params.id, (err, todo) => {
     if (err) {
       console.log(err);
       res.sendStatus(500);
@@ -159,9 +159,9 @@ const deleteToDo = async (req, res) => {
 const addCollaborator = async (req, res) => {
   // Add Collaborators to todo with given id
   const collaborator = req.body.collaborator;
-  if (!mongoose.isValidObjectId(req.params.id)) {
-    return res.status(400).json({
-      error: "Invalid todo id"
+  if (!collaborator) {
+    res.status(400).json({
+      error: "Missing required fields"
     });
   }
   ToDo.findById( req.params.id, (err, todo) => {
@@ -210,6 +210,11 @@ const addCollaborator = async (req, res) => {
 const removeCollaborator = async (req, res) => {
   console.log(req.params.id);
   console.log(req.body);
+  if(!req.body.collaborator) {
+    res.status(400).json({
+      error: "Missing required fields"
+    });
+  }
   ToDo.findById(req.params.id, (err, todo) => {
     if (err) {
       console.log(err);
