@@ -8,7 +8,7 @@ const authenticateToken = (req,res,next) => {
         authHeader.split(' ').length == 2) {
         const token = authHeader.split(' ')[1];
         Token.findOne({token},'user',(err,tokenObject)=>{
-            if (token==null) {
+            if (tokenObject==null) {
                 return res.status(401).json({
                     error: "Invalid Token"
                 });
