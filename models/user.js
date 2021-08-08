@@ -25,6 +25,12 @@ const userSchema = new Schema(
       required: true,
       index: true,
     },
+    collaboratingTodos: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "ToDo"
+      }
+    ]
   },
   { timestamps: true }
 );
