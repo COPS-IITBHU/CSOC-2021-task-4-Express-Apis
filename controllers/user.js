@@ -15,14 +15,15 @@ const login = async (req, res) => {
   // Check if data is valid
   // Return correct status codes: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
   // If the user is verified, then return a token along with correct status code
-  console.log(req.body);
   const body = req.body;
   if (!(body.username && body.password)) {
     return res.status(400).send({error: "Missing required fields"});
   }
   User.findOne({'username':body.username},'_id password',async (err,user)=>{
-    console.log(user);
-    console.log(err);
+    if (err) {
+      console.log(err);
+      return res.sendStatus(500);
+    }
     if (user == null){
       return res.status(401).json({error:"Invalid username or password"});
     }
@@ -44,7 +45,6 @@ const signup = async (req, res) => {
   // Hash the password
   // Return with appropriate status code in case of an error
   // If successful, return with an appropriate token along with correct status code
-  console.log(req.body);
   const body = req.body;
   if(!(body.email && body.password && body.name && body.username)) {
     return res.status(400).send({error: "Missing required fields"});
@@ -81,6 +81,7 @@ const signup = async (req, res) => {
            error: "email already in use"
          });
        }
+       console.log(err);
        res.sendStatus(500);
       });
     });
@@ -93,7 +94,6 @@ const profile = async (req, res) => {
   // Implement the functionality to retrieve the details
   // of the logged in user.
   // Check for the token and then use it to get user details
-  console.log(req.headers);
   const authHeader = req.headers.authorization;
   if (authHeader && 
     authHeader.split(' ')[0].toLowerCase() == 'token' &&
