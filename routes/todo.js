@@ -6,3 +6,12 @@ router.get("/", ToDoController.getAllToDo);
 router.post("/:id/", ToDoController.createToDo);
 
 // TODO: Create the end points similarly
+router.get("/:id/", ToDoController.getParticularToDo);
+router.put("/:id/", ToDoController.editToDo);
+router.patch("/:id/", ToDoController.editToDoPatch);
+router.delete("/:id/", ToDoController.deleteToDo);
+
+// End point for collaborators
+router.post("/:id/add-collaborators/", ToDoController.addCollaborators);
+router.delete("/:id/remove-collaborators/", ToDoController.removeCollaborators);
+module.exports = router;
