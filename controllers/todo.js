@@ -8,7 +8,6 @@ const { ToDo, Token, User } = require("../models");
 const getAllToDo = async (req, res) => {
   // Get the token in header.
   // Use the token to get all the ToDo's of a user
-  console.log(req.user);
   ToDo.find(
     {
       $or: [
@@ -33,7 +32,6 @@ const getAllToDo = async (req, res) => {
             console.log(err);
             return res.sendStatus(500);
           }
-          console.log(creators);
           res.status(200).json({
             createdTodos: createdTodos.map(todo => ({
               id: todo.id,
@@ -54,13 +52,11 @@ const getAllToDo = async (req, res) => {
 const createToDo = async (req, res) => {
   // Check for the token and create a todo
   // or throw error correspondingly
-  console.log(req.user);
   const todo = new ToDo({
     title: req.body.title,
     createdBy: req.user.id,
     collaborators: []
   });
-  console.log(todo);
   todo.save().then(todo => res.status(200).json(
     {
       id: todo.id,
@@ -75,7 +71,6 @@ const createToDo = async (req, res) => {
 
 const getParticularToDo = async (req, res) => {
   // Get the Todo of the logged in user with given id.
-  console.log(req.user);
   ToDo.findById(req.params.id, '_id title collaborators createdBy', (err, todo) => {
     if (err) {
       console.log(err);
@@ -173,7 +168,6 @@ const addCollaborator = async (req, res) => {
       console.log(err);
       return res.sendStatus(500);
     }
-    console.log(todo);
     if (todo == null) {
       return res.sendStatus(404);
     }
@@ -185,7 +179,6 @@ const addCollaborator = async (req, res) => {
         console.log(err);
         return res.sendStatus(500);
       }
-      console.log(collab);
       if (collab == null) {
         return res.status(404).json({
           error: "User not found"
@@ -212,13 +205,7 @@ const addCollaborator = async (req, res) => {
 };
 
 const removeCollaborator = async (req, res) => {
-  console.log(req.params.id);
-  console.log(req.body);
-  if(!req.body.collaborator) {
-    res.status(400).json({
-      error: "Missing required fields"
-    });
-  }
+
   ToDo.findById(req.params.id, (err, todo) => {
     if (err) {
       console.log(err);
@@ -248,7 +235,6 @@ const removeCollaborator = async (req, res) => {
         });
       }
       todo.collaborators.splice(todo.collaborators.indexOf(user.id), 1);
-      console.log(todo);
       todo.save().then(_ => res.sendStatus(200)).catch(_ => res.sendStatus(500));
     });
   });
